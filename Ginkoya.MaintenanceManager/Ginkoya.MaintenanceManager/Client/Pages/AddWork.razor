@@ -124,9 +124,24 @@
 </EditForm>
 
 @code {
+    /// <summary>
+    /// form Model
+    /// </summary>
     NewWorkModel model = new();
+
+    /// <summary>
+    /// Equipment types for select options
+    /// </summary>
     List<EquipmentTypeModel> EquipmentTypes = new List<EquipmentTypeModel>();
+
+    /// <summary>
+    /// Work types for equipments
+    /// </summary>
     List<WorkTypeModel> WorkTypes = new List<WorkTypeModel>();
+
+    /// <summary>
+    /// Is duration content displayed
+    /// </summary>
     bool DurationContentDisplayed = true;
 
     /// <summary>
