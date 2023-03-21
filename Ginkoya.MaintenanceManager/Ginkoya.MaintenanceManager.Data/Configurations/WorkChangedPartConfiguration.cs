@@ -12,11 +12,13 @@ namespace Ginkoya.MaintenanceManager.Data.Configurations
 
             builder.HasOne(part => part.Work)
                    .WithMany(work => work.WorkChangedParts)
-                   .HasForeignKey(part => part.WorkId);
+                   .HasForeignKey(part => part.WorkId)
+                   .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(part => part.Product)
                    .WithMany()
-                   .HasForeignKey(part => part.ProductId);
+                   .HasForeignKey(part => part.ProductId)
+                   .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

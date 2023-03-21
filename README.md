@@ -22,6 +22,11 @@ Une application va leur être réalisée pour les accompagner dans leur quotidie
 
 ### ASP Net core blazor
 
+
+### Views
+
+
+
 ## Model 
 
 ```mermaid

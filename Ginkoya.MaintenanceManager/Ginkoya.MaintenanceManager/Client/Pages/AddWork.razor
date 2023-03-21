@@ -1,0 +1,214 @@
+﻿@page "/AddWork"
+
+@using Ginkoya.MaintenanceManager.Core.Models
+@inject HttpClient Http
+
+<PageTitle>Counter</PageTitle>
+
+<EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Customer informations</h5>
+            <div class="form-row">
+                <div class="col">
+                    <label for="InputFirstName">FirstName</label>
+                    <input id="InputFirstName" type="text" class="form-control" placeholder="First name" @bind-value="model.FirstName">
+                </div>
+                <div class="col">
+                    <label for="InputLastName">LastName</label>
+                    <input id="InputLastName" type="text" class="form-control" placeholder="Last name" @bind-value="model.LastName">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">Email</label>
+                    <input type="email" class="form-control" id="inputEmail4" placeholder="Email" @bind-value="model.Mail">
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="inputPassword4">Phone number</label>
+                    <input type="password" class="form-control" id="inputPassword4" placeholder="phone" @bind-value="model.Phone">
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Equipement</h5>
+            <div class="form-row">
+                <div class="col">
+                    <label for="InputFirstName">Label</label>
+                    <input id="InputFirstName" type="text" class="form-control" placeholder="Equipment label" @bind-value="model.EquipmentLabel">
+                </div>
+                <div class="col">
+                    <label for="InputLastName">Serial Number</label>
+                    <input id="InputLastName" type="text" class="form-control" placeholder="Serial number" @bind-value="model.SerialNumber">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="TypeSelect">Type</label>
+                    <InputSelect class="form-control" id="TypeSelect" @bind-Value="model.TypeId" @oninput="LoadWorkTypes">
+                        <option disabled selected value> -- select an option -- </option>
+                        @foreach (var type in EquipmentTypes)
+                        {
+                            <option value="@type.Id">@type.Label</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Work informations</h5>
+            <div class="form-row">
+                <div class="col">
+                    <label for="WorkLabel">Label</label>
+                    <input id="WorkLabel" type="text" class="form-control" placeholder="First name" @bind-value="model.WorkLabel">
+                </div>
+                <div class="col">
+                    <label for="Date">Date</label>
+                    <InputDate id="Date" @bind-Value="model.Date" />
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="Technician">Technician </label>
+                <input type="text" class="form-control" id="Technician " placeholder="Technician name" @bind-value="model.Technician">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label for="workType">Work type</label>
+                <InputSelect class="form-control" id="workType" @bind-Value="model.WorkTypeId " @oninput="OnWorkTypeSelected">
+                    <option disabled selected value> -- select an option -- </option>
+                    @foreach (var type in WorkTypes)
+                    {
+                        <option value="@type.Id">@type.Label</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="form-row" hidden="@DurationContentDisplayed">
+            <div class="form-group col-md-12">
+                <label for="Duration">Duration</label>
+                <input type="number" class="form-control" id="Duration" @oninput="OnDurationChange" placeholder="Duration" @bind-value="model.Duration">
+            </div>
+            <div class="form-group col-md-12">
+                <label for="FinalPrice">FinalPrice</label>
+                <input type="text" class="form-control" id="FinalPrice " placeholder="Final price" disabled @bind-value="model.FinalPrice">
+            </div>
+        </div>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Add</button>
+    <br />
+</EditForm>
+
+@code {
+    NewWorkModel model = new();
+    List<EquipmentTypeModel> EquipmentTypes = new List<EquipmentTypeModel>();
+    List<WorkTypeModel> WorkTypes = new List<WorkTypeModel>();
+    bool DurationContentDisplayed = true;
+
+    /// <summary>
+    /// Initialization method
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        //Load equipment types (bike, ski, ...)
+        var items = await Http.GetFromJsonAsync<EquipmentTypeModel[]>("Equipment/GetTypes");
+        EquipmentTypes.AddRange(items);
+    }
+
+    /// <summary>
+    /// On equipment type selected, load associed work type
+    /// </summary>
+    /// <returns></returns>
+    private async Task LoadWorkTypes(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+
+        var items = await Http.GetFromJsonAsync<WorkTypeModel[]>($"Equipment/GetWorkFor?equipmentTypeId={e.Value as string}");
+        WorkTypes.Clear();
+        WorkTypes.AddRange(items);
+    }
+
+    /// <summary>
+    /// On work type selected
+    /// </summary>
+    private void OnWorkTypeSelected(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+        int workTypeId = int.Parse(e.Value as string);
+        var workType = WorkTypes.FirstOrDefault(w => w.Id == workTypeId);
+        if (workType == default)
+        {
+            DurationContentDisplayed = true;
+            return;
+        }
+
+        if (workType.HaveFixedPrice)
+        {
+            DurationContentDisplayed = true;
+
+            model.Duration = workType.FixedDuration;
+            model.FinalPrice = workType.Price;
+        }
+        else
+        {
+            model.Duration = 1;
+            DurationContentDisplayed = false;
+            ComputeFinalPrice(model.Duration, workType.Price);
+        }
+    }
+
+    /// <summary>
+    /// On duration change
+    /// </summary>
+    /// <param name="e"></param>
+    private void OnDurationChange(ChangeEventArgs e)
+    {
+        if (e.Value is null)
+        {
+            return;
+        }
+
+        int duration = int.Parse(e.Value as string);
+        var workType = WorkTypes.FirstOrDefault(w => w.Id == model.WorkTypeId);
+        if (!workType.HaveFixedPrice)
+        {
+            ComputeFinalPrice(duration, workType.Price);
+        }
+    }
+
+    /// <summary>
+    /// Compute price
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <param name="price"></param>
+    private void ComputeFinalPrice(int duration, int price)
+    {
+        model.FinalPrice = model.Duration * price;
+    }
+
+    /// <summary>
+    /// Send form
+    /// </summary>
+    private async Task HandleValidSubmit()
+    {
+        await Http.PostAsJsonAsync("Work/Create", model);
+    }
+}

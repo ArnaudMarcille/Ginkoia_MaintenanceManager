@@ -1,12 +1,9 @@
-﻿namespace Ginkoya.MaintenanceManager.Core.Entities
+﻿namespace Ginkoya.MaintenanceManager.Core.Models
 {
     /// <summary>
-    /// Define a work type
-    /// <para>
-    /// ex : repair, contro
-    /// </para> 
+    /// Model for View management
     /// </summary>
-    public class WorkType
+    public class WorkTypeModel
     {
         /// <summary>
         /// Identifier
@@ -44,22 +41,5 @@
         /// Duration for fixed price
         /// </summary>
         public int FixedDuration { get; set; }
-
-        /// <summary>
-        /// Targeted equipment type
-        /// </summary>
-        public int EquipmentTypeId { get; set; }
-
-        #region Navigation
-
-        /// <summary>
-        /// Equipment type
-        /// </summary>
-        public EquipmentType EquipmentType { get; set; }
-
-        public List<Work> Works { get; set; }
-
-        #endregion
-
     }
 }

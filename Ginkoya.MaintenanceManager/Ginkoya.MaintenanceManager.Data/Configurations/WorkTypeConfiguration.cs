@@ -12,7 +12,8 @@ namespace Ginkoya.MaintenanceManager.Data.Configurations
 
             builder.HasOne(type => type.EquipmentType)
                    .WithMany(equipmentType => equipmentType.WorkTypes)
-                   .HasForeignKey(type => type.EquipmentTypeId);
+                   .HasForeignKey(type => type.EquipmentTypeId)
+                   .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
