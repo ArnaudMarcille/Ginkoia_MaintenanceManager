@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Ginkoya.MaintenanceManager.Core\Ginkoya.MaintenanceManager.Core.csproj" />
-    <ProjectReference Include="..\Shared\Ginkoya.MaintenanceManager.Shared.csproj" />
   </ItemGroup>
 
 </Project>

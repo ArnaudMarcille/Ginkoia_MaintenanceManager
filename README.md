@@ -25,15 +25,17 @@ Une application va leur être réalisée pour les accompagner dans leur quotidie
 
 ### Views
 
+3 Views are planned:
 
+    - List of works : from it, we can see all the list of 
+    - Create a new work : we can create a new work with all data completion
+    - Edit settings : page for update or create new equipment type, work type, of catalog product
 
 ## Model 
 
 ```mermaid
 
----
-title: Ginkoya
----
+
 
 classDiagram
 direction RL

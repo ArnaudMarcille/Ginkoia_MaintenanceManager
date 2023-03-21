@@ -2,6 +2,7 @@
 
 @using Ginkoya.MaintenanceManager.Core.Models
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime
 
 <PageTitle>Counter</PageTitle>
 
@@ -25,8 +26,8 @@
                     <input type="email" class="form-control" id="inputEmail4" placeholder="Email" @bind-value="model.Mail">
                 </div>
                 <div class="form-group col-md-12">
-                    <label for="inputPassword4">Phone number</label>
-                    <input type="password" class="form-control" id="inputPassword4" placeholder="phone" @bind-value="model.Phone">
+                    <label for="Phone">Phone number</label>
+                    <input type="text" class="form-control" id="Phone" placeholder="phone" @bind-value="model.Phone">
                 </div>
             </div>
         </div>
@@ -49,7 +50,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="TypeSelect">Type</label>
-                    <InputSelect class="form-control" id="TypeSelect" @bind-Value="model.TypeId" @oninput="LoadWorkTypes">
+                    <InputSelect class="form-control form-select" size="3" id="TypeSelect" @bind-Value="model.TypeId" @oninput="LoadWorkTypes">
                         <option disabled selected value> -- select an option -- </option>
                         @foreach (var type in EquipmentTypes)
                         {
@@ -68,40 +69,52 @@
             <div class="form-row">
                 <div class="col">
                     <label for="WorkLabel">Label</label>
-                    <input id="WorkLabel" type="text" class="form-control" placeholder="First name" @bind-value="model.WorkLabel">
+                    <input id="WorkLabel" type="text" class="form-control" placeholder="WorkLabel" @bind-value="model.WorkLabel">
                 </div>
                 <div class="col">
                     <label for="Date">Date</label>
+                    <br />
                     <InputDate id="Date" @bind-Value="model.Date" />
                 </div>
             </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <label for="Technician">Technician </label>
-                <input type="text" class="form-control" id="Technician " placeholder="Technician name" @bind-value="model.Technician">
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="Technician">Technician </label>
+                    <input type="text" class="form-control" id="Technician " placeholder="Technician name" @bind-value="model.Technician">
+                </div>
             </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
-                <label for="workType">Work type</label>
-                <InputSelect class="form-control" id="workType" @bind-Value="model.WorkTypeId " @oninput="OnWorkTypeSelected">
-                    <option disabled selected value> -- select an option -- </option>
-                    @foreach (var type in WorkTypes)
-                    {
-                        <option value="@type.Id">@type.Label</option>
-                    }
-                </InputSelect>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="workType">Work type</label>
+                    <InputSelect class="form-control form-select" size="3" id="workType" @bind-Value="model.WorkTypeId " @oninput="OnWorkTypeSelected">
+                        <option disabled selected value> -- select an option -- </option>
+                        @foreach (var type in WorkTypes)
+                        {
+                            <option value="@type.Id">
+                                @type.Label
+                                @if (type.HaveFixedPrice)
+                                {
+                                    <text>- @type.Price € - @type.FixedDuration min </text>
+                                }
+                                else
+                                {
+                                    <text>- @type.Price € / min </text>
+                                }
+                            </option>
+                        }
+                    </InputSelect>
+                </div>
             </div>
-        </div>
-        <div class="form-row" hidden="@DurationContentDisplayed">
-            <div class="form-group col-md-12">
-                <label for="Duration">Duration</label>
-                <input type="number" class="form-control" id="Duration" @oninput="OnDurationChange" placeholder="Duration" @bind-value="model.Duration">
-            </div>
-            <div class="form-group col-md-12">
-                <label for="FinalPrice">FinalPrice</label>
-                <input type="text" class="form-control" id="FinalPrice " placeholder="Final price" disabled @bind-value="model.FinalPrice">
+            <div class="form-row" hidden="@DurationContentDisplayed">
+                <div class="form-group col-md-12">
+                    <label for="Duration">Duration</label>
+                    <input type="number" class="form-control" id="Duration" @oninput="OnDurationChange" placeholder="Duration" @bind-value="model.Duration">
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="FinalPrice">FinalPrice</label>
+                    <input type="text" class="form-control" id="FinalPrice " placeholder="Final price" disabled @bind-value="model.FinalPrice">
+                </div>
             </div>
         </div>
     </div>
@@ -201,7 +214,7 @@
     /// <param name="price"></param>
     private void ComputeFinalPrice(int duration, int price)
     {
-        model.FinalPrice = model.Duration * price;
+        model.FinalPrice = duration * price;
     }
 
     /// <summary>
@@ -210,5 +223,7 @@
     private async Task HandleValidSubmit()
     {
         await Http.PostAsJsonAsync("Work/Create", model);
+        await JsRuntime.InvokeVoidAsync("alert", "Created"); // Alert
+
     }
 }

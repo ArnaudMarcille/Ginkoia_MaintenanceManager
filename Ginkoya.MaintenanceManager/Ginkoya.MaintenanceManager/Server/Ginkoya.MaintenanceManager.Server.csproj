@@ -14,7 +14,6 @@
     <ProjectReference Include="..\..\Ginkoya.MaintenanceManager.Data\Ginkoya.MaintenanceManager.Data.csproj" />
     <ProjectReference Include="..\..\Ginkoya.MaintenanceManager.Services\Ginkoya.MaintenanceManager.Services.csproj" />
     <ProjectReference Include="..\Client\Ginkoya.MaintenanceManager.Client.csproj" />
-    <ProjectReference Include="..\Shared\Ginkoya.MaintenanceManager.Shared.csproj" />
   </ItemGroup>
 
 
