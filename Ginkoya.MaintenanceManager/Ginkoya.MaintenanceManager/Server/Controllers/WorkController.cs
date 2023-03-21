@@ -14,12 +14,14 @@ namespace Ginkoya.MaintenanceManager.Server.Controllers
         #region Fields
 
         private readonly WorkHelper workHelper;
+        private readonly WorkService workService;
 
         #endregion
 
-        public WorkController(WorkHelper workHelper)
+        public WorkController(WorkHelper workHelper, WorkService workService)
         {
             this.workHelper = workHelper;
+            this.workService = workService;
         }
 
         [HttpPost]
@@ -31,6 +33,12 @@ namespace Ginkoya.MaintenanceManager.Server.Controllers
             }
 
             workHelper.SaveWork(newWorkModel);
+        }
+
+        [HttpGet]
+        public List<WorkListItemModel> GetAll()
+        {
+            return workService.ListWork();
         }
     }
 }

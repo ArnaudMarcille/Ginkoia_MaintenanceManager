@@ -1,9 +1,54 @@
 ﻿@page "/"
+@inject HttpClient Http
+@using Ginkoya.MaintenanceManager.Core.Models;
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Technician Name</th>
+            <th scope="col">Type</th>
+            <th scope="col">Equipment</th>
+            <th scope="col">Work detail</th>
+            <th scope="col">Work done</th>
+            <th scope="col">Price</th>
+            <th scope="col">Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Works)
+        {
+            <tr>
+                <td>@item.CustomerFullName</td>
+                <td>@item.TechnicianName</td>
+                <td>@item.EquipmentTypeLabel</td>
+                <td>@item.EquipmentLabel</td>
+                <td>@item.WorkLabel</td>
+                <td>@item.WorkTypeLabel</td>
+                <td>@item.Price €</td>
+                <td>@item.Duration min</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-Welcome to your new app.
+@code {
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    /// <summary>
+    /// Work done
+    /// </summary>
+    List<WorkListItemModel> Works = new List<WorkListItemModel>();
+
+    /// <summary>
+    /// Initialization method
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        //Load equipment types (bike, ski, ...)
+        var items = await Http.GetFromJsonAsync<WorkListItemModel[]>("Work/GetAll");
+        Works.AddRange(items);
+    }
+}

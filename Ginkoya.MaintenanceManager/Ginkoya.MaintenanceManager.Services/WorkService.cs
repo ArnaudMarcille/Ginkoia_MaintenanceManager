@@ -1,5 +1,7 @@
 ﻿using Ginkoya.MaintenanceManager.Core.Entities;
+using Ginkoya.MaintenanceManager.Core.Models;
 using Ginkoya.MaintenanceManager.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ginkoya.MaintenanceManager.Services
 {
@@ -22,7 +24,6 @@ namespace Ginkoya.MaintenanceManager.Services
         /// <returns></returns>
         public int Create(string label, DateTime date, string technician, int duration, int finalPrice, int equipmentId, int workTypeId)
         {
-
             Work work = new Work()
             {
                 Label = label,
@@ -38,6 +39,36 @@ namespace Ginkoya.MaintenanceManager.Services
 
             DbContext.SaveChanges();
             return work.Id;
+        }
+
+        /// <summary>
+        /// Return all the work item 
+        /// </summary>
+        /// <returns></returns>
+        public List<WorkListItemModel> ListWork()
+        {
+            List<WorkListItemModel> workListItemModels = new List<WorkListItemModel>();
+            var entities = DbContext.Works.Include(w => w.WorkType)
+                                          .Include(w => w.Equipment)
+                                            .ThenInclude(e => e.Customer)
+                                          .Include(w => w.Equipment)
+                                            .ThenInclude(e => e.Type).ToList();
+
+            foreach (var entity in entities)
+            {
+                workListItemModels.Add(new WorkListItemModel()
+                {
+                    CustomerFullName = entity.Equipment.Customer.FirstName + " " + entity.Equipment.Customer.LastName,
+                    TechnicianName = entity.Technician,
+                    EquipmentLabel = entity.Equipment.Label,
+                    EquipmentTypeLabel = entity.Equipment.Type.Label,
+                    Duration = entity.Duration,
+                    Price = entity.FinalPrice,
+                    WorkLabel = entity.Label,
+                    WorkTypeLabel = entity.WorkType.Label,
+                });
+            }
+            return workListItemModels;
         }
     }
 }
